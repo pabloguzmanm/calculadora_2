@@ -4,118 +4,116 @@
   <meta charset="UTF-8" />
   <title>Calculadora de Ahorro con IA</title>
   <style>
-   /* Fondo que cubre toda la ventana */
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-}
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      width: 100%;
+      overflow-x: hidden;
+    }
 
-body {
-  background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center fixed;
-  background-size: cover;
-  font-family: 'Segoe UI', sans-serif;
-  color: #fff;
-  padding: 4vh 0;
-}
+    body {
+      background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2em;
+    }
 
-.container {
-  background-color: rgba(0, 0, 0, 0.4);
-  padding: 2em;
-  max-width: 700px;
-  width: 90%;
-  border-radius: 20px;
-  backdrop-filter: blur(6px);
-  box-shadow: 0 0 20px rgba(0,0,0,0.4);
-  margin: 0 auto;
-}
+    .container {
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 2em;
+      max-width: 1000px;
+      width: 100%;
+      border-radius: 20px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
 
-h1 {
-  text-align: center;
-  color: white;
-  margin-bottom: 1em;
-}
+    h1 {
+      text-align: center;
+      color: white;
+      margin-bottom: 1em;
+    }
 
-label, .checkbox-label {
-  font-size: 1.1em;
-  font-weight: bold;
-  color: #fff;
-}
+    label, .checkbox-label {
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #fff;
+    }
 
-.checkbox-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1em;
-  margin-top: 1em;
-}
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1em;
+      margin-top: 1em;
+    }
 
-.checkbox-group label {
-  flex: 1 1 calc(33.333% - 1em); /* 3 columnas */
-  background-color: rgba(255, 255, 255, 0.1);
-  padding: 1em;
-  border-radius: 12px;
-  cursor: pointer;
-  color: #fff;
-  font-weight: 600;
-  font-size: 1em;
-  display: flex;
-  align-items: center;
-  gap: 0.75em;
-  transition: background-color 0.3s, box-shadow 0.3s;
-  user-select: none;
-  position: relative;
-  min-height: 60px;  /* altura fija para igual tamaño */
-  box-sizing: border-box;
-  justify-content: flex-start;
-}
+    .checkbox-group label {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 1em;
+      border-radius: 12px;
+      cursor: pointer;
+      color: #fff;
+      font-weight: 600;
+      font-size: 1em;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0.75em;
+      transition: background-color 0.3s, box-shadow 0.3s;
+      user-select: none;
+      position: relative;
+      min-height: 100px; /* Uniform height */
+      box-sizing: border-box;
+    }
 
-/* Ocultar checkbox real */
-.checkbox-group input[type="checkbox"] {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-}
+    .checkbox-group input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
 
-/* Estilo cuando está seleccionado */
-.checkbox-group input[type="checkbox"]:checked + span {
-  background-color: #4caf50;
-  box-shadow: 0 0 10px #4caf50aa;
-  color: white;
-  border-radius: 12px;
-  padding: 1em;
-  display: block;
-  flex: 1;
-}
+    .checkbox-group input[type="checkbox"]:checked + span {
+      background-color: #4caf50;
+      box-shadow: 0 0 10px #4caf50aa;
+      color: white;
+      border-radius: 12px;
+      padding: 1em;
+      display: block;
+      flex: 1;
+    }
 
-button {
-  width: 100%;
-  padding: 1em;
-  margin-top: 1em;
-  font-size: 1em;
-  border-radius: 10px;
-  border: none;
-  background-color: rgba(255, 255, 255, 0.15);
-  color: white;
-  font-weight: bold;
-  backdrop-filter: blur(8px);
-  transition: background-color 0.3s;
-}
+    button {
+      width: 100%;
+      padding: 1em;
+      margin-top: 1em;
+      font-size: 1em;
+      border-radius: 10px;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.15);
+      color: white;
+      font-weight: bold;
+      backdrop-filter: blur(8px);
+      transition: background-color 0.3s;
+    }
 
-button:hover {
-  background-color: rgba(255, 255, 255, 0.3);
-  cursor: pointer;
-}
+    button:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+    }
 
-#resultado, #perfil {
-  margin-top: 1em;
-  padding: 1em;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-}
-
+    #resultado, #perfil {
+      margin-top: 1em;
+      padding: 1em;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
   </style>
 </head>
 <body>
@@ -123,46 +121,16 @@ button:hover {
     <h1>Descubre Cuánto Tiempo Puedes Ahorrar con IA</h1>
     <label class="checkbox-label">Selecciona una o más tareas:</label>
     <div class="checkbox-group" id="tareas">
-      <label>
-        <input type="checkbox" value="300,60,Comunicador" />
-        <span>Responder correos electrónicos</span>
-      </label>
-      <label>
-        <input type="checkbox" value="90,80,Comunicador" />
-        <span>Agendar reuniones</span>
-      </label>
-      <label>
-        <input type="checkbox" value="180,70,Investigador" />
-        <span>Buscar información</span>
-      </label>
-      <label>
-        <input type="checkbox" value="180,65,Analítico" />
-        <span>Redactar documentos</span>
-      </label>
-      <label>
-        <input type="checkbox" value="60,90,Investigador" />
-        <span>Transcribir reuniones</span>
-      </label>
-      <label>
-        <input type="checkbox" value="160,50,Productivo" />
-        <span>Seguimiento de proyectos</span>
-      </label>
-      <label>
-        <input type="checkbox" value="250,75,Comunicador" />
-        <span>Atención al cliente</span>
-      </label>
-      <label>
-        <input type="checkbox" value="120,50,Productivo" />
-        <span>Edición de contenido</span>
-      </label>
-      <label>
-        <input type="checkbox" value="135,60,Comunicador" />
-        <span>Publicaciones en RRSS</span>
-      </label>
-      <label>
-        <input type="checkbox" value="120,55,Analítico" />
-        <span>Análisis de datos</span>
-      </label>
+      <label><input type="checkbox" value="300,60,Comunicador" /><span>Responder correos electrónicos</span></label>
+      <label><input type="checkbox" value="90,80,Comunicador" /><span>Agendar reuniones</span></label>
+      <label><input type="checkbox" value="180,70,Investigador" /><span>Buscar información</span></label>
+      <label><input type="checkbox" value="180,65,Analítico" /><span>Redactar documentos</span></label>
+      <label><input type="checkbox" value="60,90,Investigador" /><span>Transcribir reuniones</span></label>
+      <label><input type="checkbox" value="160,50,Productivo" /><span>Seguimiento de proyectos</span></label>
+      <label><input type="checkbox" value="250,75,Comunicador" /><span>Atención al cliente</span></label>
+      <label><input type="checkbox" value="120,50,Productivo" /><span>Edición de contenido</span></label>
+      <label><input type="checkbox" value="135,60,Comunicador" /><span>Publicaciones en RRSS</span></label>
+      <label><input type="checkbox" value="120,55,Analítico" /><span>Análisis de datos</span></label>
     </div>
 
     <div id="resultado"></div>
