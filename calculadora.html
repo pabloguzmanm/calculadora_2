@@ -3,65 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <title>Calculadora de Ahorro con IA</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center fixed;
-      background-size: cover;
-      color: #fff;
-    }
-    .container {
-      background-color: rgba(0, 0, 0, 0.4);
-      padding: 2em;
-      max-width: 700px;
-      margin: 5em auto;
-      border-radius: 20px;
-      backdrop-filter: blur(6px);
-    }
-    label, .checkbox-label {
-      font-size: 1.2em;
-      font-weight: bold;
-      color: #fff;
-    }
-    .checkbox-group {
-      margin-top: 1em;
-    }
-    .checkbox-group label {
-      display: block;
-      margin-bottom: 0.5em;
-      background-color: rgba(255,255,255,0.1);
-      padding: 0.5em;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    input[type="checkbox"] {
-      margin-right: 1em;
-      transform: scale(1.3);
-    }
-    button {
-      width: 100%;
-      padding: 1em;
-      margin-top: 1em;
-      font-size: 1em;
-      border-radius: 10px;
-      border: none;
-      background-color: rgba(255, 255, 255, 0.15);
-      color: white;
-      font-weight: bold;
-      backdrop-filter: blur(8px);
-    }
-    button:hover {
-      background-color: rgba(255, 255, 255, 0.3);
-      cursor: pointer;
-    }
-    #resultado, #perfil {
-      margin-top: 1em;
-      padding: 1em;
-      background-color: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-    }
-  </style>
+ <style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+
+  body {
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+    background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center fixed;
+    background-size: cover;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .container {
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 2em;
+    max-width: 700px;
+    width: 90%;
+    border-radius: 20px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  }
+
+  h1 {
+    text-align: center;
+    color: white;
+    margin-bottom: 1em;
+  }
+
+  label, .checkbox-label {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .checkbox-group {
+    margin-top: 1em;
+  }
+
+  .checkbox-group label {
+    display: block;
+    margin-bottom: 0.5em;
+    background-color: rgba(255,255,255,0.1);
+    padding: 0.5em;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  input[type="checkbox"] {
+    margin-right: 1em;
+    transform: scale(1.3);
+  }
+
+  button {
+    width: 100%;
+    padding: 1em;
+    margin-top: 1em;
+    font-size: 1em;
+    border-radius: 10px;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-weight: bold;
+    backdrop-filter: blur(8px);
+  }
+
+  button:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+  }
+
+  #resultado, #perfil {
+    margin-top: 1em;
+    padding: 1em;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+</style>
 </head>
 <body>
   <div class="container">
