@@ -14,17 +14,32 @@
     .container {
       background-color: rgba(0, 0, 0, 0.4);
       padding: 2em;
-      max-width: 600px;
+      max-width: 700px;
       margin: 5em auto;
       border-radius: 20px;
       backdrop-filter: blur(6px);
     }
-    label {
-      font-size: 1.3em;
+    label, .checkbox-label {
+      font-size: 1.2em;
       font-weight: bold;
       color: #fff;
     }
-    select, button {
+    .checkbox-group {
+      margin-top: 1em;
+    }
+    .checkbox-group label {
+      display: block;
+      margin-bottom: 0.5em;
+      background-color: rgba(255,255,255,0.1);
+      padding: 0.5em;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    input[type="checkbox"] {
+      margin-right: 1em;
+      transform: scale(1.3);
+    }
+    button {
       width: 100%;
       padding: 1em;
       margin-top: 1em;
@@ -35,10 +50,6 @@
       color: white;
       font-weight: bold;
       backdrop-filter: blur(8px);
-    }
-    select option {
-      color: black;
-      background-color: white;
     }
     button:hover {
       background-color: rgba(255, 255, 255, 0.3);
@@ -54,23 +65,24 @@
 </head>
 <body>
   <div class="container">
-    <label for="tarea">Selecciona una o más tareas:</label>
-    <select id="tarea" multiple onchange="calcularAhorro()">
-      <option value="300,60,Comunicador">Responder correos electrónicos</option>
-      <option value="90,80,Comunicador">Agendar reuniones</option>
-      <option value="180,70,Investigador">Buscar información</option>
-      <option value="180,65,Analítico">Redactar documentos</option>
-      <option value="60,90,Investigador">Transcribir reuniones</option>
-      <option value="160,50,Productivo">Seguimiento de proyectos</option>
-      <option value="250,75,Comunicador">Atención al cliente</option>
-      <option value="120,50,Productivo">Edición de contenido</option>
-      <option value="135,60,Comunicador">Publicaciones en RRSS</option>
-      <option value="120,55,Analítico">Análisis de datos</option>
-    </select>
+    <label class="checkbox-label">Selecciona una o más tareas:</label>
+    <div class="checkbox-group" id="tareas">
+      <label><input type="checkbox" value="300,60,Comunicador">Responder correos electrónicos</label>
+      <label><input type="checkbox" value="90,80,Comunicador">Agendar reuniones</label>
+      <label><input type="checkbox" value="180,70,Investigador">Buscar información</label>
+      <label><input type="checkbox" value="180,65,Analítico">Redactar documentos</label>
+      <label><input type="checkbox" value="60,90,Investigador">Transcribir reuniones</label>
+      <label><input type="checkbox" value="160,50,Productivo">Seguimiento de proyectos</label>
+      <label><input type="checkbox" value="250,75,Comunicador">Atención al cliente</label>
+      <label><input type="checkbox" value="120,50,Productivo">Edición de contenido</label>
+      <label><input type="checkbox" value="135,60,Comunicador">Publicaciones en RRSS</label>
+      <label><input type="checkbox" value="120,55,Analítico">Análisis de datos</label>
+    </div>
 
     <div id="resultado"></div>
     <div id="perfil"></div>
 
+    <button onclick="calcularAhorro()">Calcular Ahorro</button>
     <button onclick="exportarPDF()">Exportar Resultado como PDF</button>
   </div>
 
@@ -81,28 +93,27 @@
     let perfiles = [];
 
     function calcularAhorro() {
-      const selector = document.getElementById("tarea");
+      const checks = document.querySelectorAll('#tareas input[type="checkbox"]:checked');
       const resultado = document.getElementById("resultado");
       const perfil = document.getElementById("perfil");
-      const selectedOptions = Array.from(selector.selectedOptions);
 
       ahorroTotal = 0;
       perfiles = [];
 
-      if (selectedOptions.length === 0) {
+      if (checks.length === 0) {
         resultado.innerHTML = "";
         perfil.innerHTML = "";
         return;
       }
 
       let resumen = "";
-      selectedOptions.forEach(opt => {
+      checks.forEach(opt => {
         const [minutos, porcentaje, perfilTipo] = opt.value.split(",");
         const ahorro = (parseInt(minutos) * parseInt(porcentaje)) / 100;
         const ahorro2anios = ahorro * 52 * 2;
         ahorroTotal += ahorro2anios;
         perfiles.push(perfilTipo);
-        resumen += `<li>${opt.text}: <strong>${ahorro} min/sem</strong>, <strong>${ahorro2anios} min/2 años</strong></li>`;
+        resumen += `<li>${opt.parentElement.innerText}: <strong>${ahorro} min/sem</strong>, <strong>${ahorro2anios} min/2 años</strong></li>`;
       });
 
       resultado.innerHTML = `
@@ -111,7 +122,6 @@
         <p><strong>Total estimado en 2 años:</strong> ${ahorroTotal} minutos</p>
       `;
 
-      // Sugerencias por perfil
       let desarrollo = {
         "Analítico": "Cursos en Power BI, Excel avanzado, automatización.",
         "Comunicador": "Storytelling, persuasión, liderazgo de equipos.",
@@ -119,7 +129,6 @@
         "Investigador": "Lectura crítica, síntesis, herramientas de búsqueda."
       };
 
-      // Mostrar perfiles únicos
       const perfilesUnicos = [...new Set(perfiles)];
       let sugerencias = perfilesUnicos.map(p => `<strong>${p}</strong>: ${desarrollo[p]}`).join("<br>");
 
@@ -144,5 +153,6 @@
   </script>
 </body>
 </html>
+
 
 
