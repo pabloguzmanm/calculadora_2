@@ -7,7 +7,7 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: url('https://unsplash.com/es/fotos/cuerpo-de-agua-bajo-el-cielo-azul-y-blanco-durante-el-dia-IZ01rjX0XQA') no-repeat center center fixed;
+      background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center fixed;
       background-size: cover;
       color: #fff;
     }
@@ -20,7 +20,7 @@
       backdrop-filter: blur(6px);
     }
     label {
-      font-size: 1.1em;
+      font-size: 1.3em;
       font-weight: bold;
       color: #fff;
     }
@@ -35,9 +35,15 @@
       color: white;
       font-weight: bold;
       backdrop-filter: blur(8px);
+      appearance: none;
+    }
+    select option {
+      color: black; /* Hacemos visibles las opciones del select */
+      background-color: white;
     }
     button:hover {
       background-color: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
     }
     #resultado, #perfil {
       margin-top: 1em;
@@ -147,3 +153,4 @@
   </script>
 </body>
 </html>
+
