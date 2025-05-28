@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora de Ahorro con IA</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://media.giphy.com/media/U4FkC2VqpeNRHjTDQz/giphy.gif') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+    }
+    .container {
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 2em;
+      max-width: 600px;
+      margin: 5em auto;
+      border-radius: 20px;
+      backdrop-filter: blur(6px);
+    }
+    label {
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #fff;
+    }
+    select, button {
+      width: 100%;
+      padding: 1em;
+      margin-top: 1em;
+      font-size: 1em;
+      border-radius: 10px;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.15);
+      color: white;
+      font-weight: bold;
+      backdrop-filter: blur(8px);
+    }
+    button:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+    #resultado, #perfil {
+      margin-top: 1em;
+      padding: 1em;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <label for="tarea">Selecciona una tarea:</label>
+    <select id="tarea" onchange="calcularAhorro()">
+      <option value="" disabled selected>Elige una tarea</option>
+      <option value="300,60,Comunicador">Responder correos electrónicos</option>
+      <option value="90,80,Comunicador">Agendar reuniones</option>
+      <option value="180,70,Investigador">Buscar información</option>
+      <option value="180,65,Analítico">Redactar documentos</option>
+      <option value="60,90,Investigador">Transcribir reuniones</option>
+      <option value="160,50,Productivo">Seguimiento de proyectos</option>
+      <option value="250,75,Comunicador">Atención al cliente</option>
+      <option value="120,50,Productivo">Edición de contenido</option>
+      <option value="135,60,Comunicador">Publicaciones en RRSS</option>
+      <option value="120,55,Analítico">Análisis de datos</option>
+    </select>
+
+    <div id="resultado"></div>
+    <div id="perfil"></div>
+
+    <button onclick="exportarPDF()">Exportar Resultado como PDF</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    let ahorroTotal = 0;
+    let perfilFinal = '';
+
+    function calcularAhorro() {
+      const selector = document.getElementById("tarea");
+      const resultado = document.getElementById("resultado");
+      const perfil = document.getElementById("perfil");
+      const [minutos, porcentaje, perfilTipo] = selector.value.split(",");
+      const ahorro = (parseInt(minutos) * parseInt(porcentaje)) / 100;
+      ahorroTotal = ahorro * 52 * 2; // estimación a 2 años
+      perfilFinal = perfilTipo;
+
+      resultado.innerHTML = `Ahorro estimado por semana: <strong>${ahorro} min</strong><br>Estimado en 2 años: <strong>${ahorroTotal} minutos</strong>`;
+
+      let desarrollo = {
+        "Analítico": "Cursos en Power BI, Excel avanzado, automatización.",
+        "Comunicador": "Storytelling, persuasión, liderazgo de equipos.",
+        "Productivo": "Notion, metodologías ágiles, gestión personal.",
+        "Investigador": "Lectura crítica, síntesis, herramientas de búsqueda."
+      };
+
+      perfil.innerHTML = `Perfil Detectado: <strong>${perfilTipo}</strong><br>Sugerencia: ${desarrollo[perfilTipo]}`;
+    }
+
+    async function exportarPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(16);
+      doc.text("Resumen de Ahorro con IA", 20, 20);
+      doc.setFontSize(12);
+      doc.text(`Perfil: ${perfilFinal}`, 20, 30);
+      doc.text(`Ahorro estimado a 2 años: ${ahorroTotal} minutos`, 20, 40);
+
+      const tareaSeleccionada = document.getElementById("tarea").value;
+      if (!tareaSeleccionada) {
+        alert("Por favor selecciona una tarea antes de exportar.");
+        return;
+      }
+
+      const [minutos, porcentaje] = tareaSeleccionada.split(",");
+      const sinIA = (parseInt(minutos) * 52 * 2);
+      const conIA = sinIA - ahorroTotal;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 400;
+      canvas.height = 200;
+      document.body.appendChild(canvas);
+
+      new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: ['Sin IA', 'Con IA'],
+          datasets: [{
+            label: 'Minutos trabajados en 2 años',
+            data: [sinIA, conIA],
+            backgroundColor: ['#ff6b6b', '#1dd3b0']
+          }]
+        },
+        options: {
+          responsive: false,
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      doc.addImage(canvas.toDataURL("image/png"), 'PNG', 20, 50, 160, 80);
+      document.body.removeChild(canvas);
+
+      doc.save("resumen_ahorro_IA.pdf");
+    }
+  </script>
+</body>
+</html>
