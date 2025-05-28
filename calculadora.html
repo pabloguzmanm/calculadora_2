@@ -35,10 +35,9 @@
       color: white;
       font-weight: bold;
       backdrop-filter: blur(8px);
-      appearance: none;
     }
     select option {
-      color: black; /* Hacemos visibles las opciones del select */
+      color: black;
       background-color: white;
     }
     button:hover {
@@ -55,9 +54,8 @@
 </head>
 <body>
   <div class="container">
-    <label for="tarea">Selecciona una tarea:</label>
-    <select id="tarea" onchange="calcularAhorro()">
-      <option value="" disabled selected>Elige una tarea</option>
+    <label for="tarea">Selecciona una o más tareas:</label>
+    <select id="tarea" multiple onchange="calcularAhorro()">
       <option value="300,60,Comunicador">Responder correos electrónicos</option>
       <option value="90,80,Comunicador">Agendar reuniones</option>
       <option value="180,70,Investigador">Buscar información</option>
@@ -80,19 +78,40 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     let ahorroTotal = 0;
-    let perfilFinal = '';
+    let perfiles = [];
 
     function calcularAhorro() {
       const selector = document.getElementById("tarea");
       const resultado = document.getElementById("resultado");
       const perfil = document.getElementById("perfil");
-      const [minutos, porcentaje, perfilTipo] = selector.value.split(",");
-      const ahorro = (parseInt(minutos) * parseInt(porcentaje)) / 100;
-      ahorroTotal = ahorro * 52 * 2; // estimación a 2 años
-      perfilFinal = perfilTipo;
+      const selectedOptions = Array.from(selector.selectedOptions);
 
-      resultado.innerHTML = `Ahorro estimado por semana: <strong>${ahorro} min</strong><br>Estimado en 2 años: <strong>${ahorroTotal} minutos</strong>`;
+      ahorroTotal = 0;
+      perfiles = [];
 
+      if (selectedOptions.length === 0) {
+        resultado.innerHTML = "";
+        perfil.innerHTML = "";
+        return;
+      }
+
+      let resumen = "";
+      selectedOptions.forEach(opt => {
+        const [minutos, porcentaje, perfilTipo] = opt.value.split(",");
+        const ahorro = (parseInt(minutos) * parseInt(porcentaje)) / 100;
+        const ahorro2anios = ahorro * 52 * 2;
+        ahorroTotal += ahorro2anios;
+        perfiles.push(perfilTipo);
+        resumen += `<li>${opt.text}: <strong>${ahorro} min/sem</strong>, <strong>${ahorro2anios} min/2 años</strong></li>`;
+      });
+
+      resultado.innerHTML = `
+        <strong>Ahorro estimado:</strong>
+        <ul>${resumen}</ul>
+        <p><strong>Total estimado en 2 años:</strong> ${ahorroTotal} minutos</p>
+      `;
+
+      // Sugerencias por perfil
       let desarrollo = {
         "Analítico": "Cursos en Power BI, Excel avanzado, automatización.",
         "Comunicador": "Storytelling, persuasión, liderazgo de equipos.",
@@ -100,7 +119,14 @@
         "Investigador": "Lectura crítica, síntesis, herramientas de búsqueda."
       };
 
-      perfil.innerHTML = `Perfil Detectado: <strong>${perfilTipo}</strong><br>Sugerencia: ${desarrollo[perfilTipo]}`;
+      // Mostrar perfiles únicos
+      const perfilesUnicos = [...new Set(perfiles)];
+      let sugerencias = perfilesUnicos.map(p => `<strong>${p}</strong>: ${desarrollo[p]}`).join("<br>");
+
+      perfil.innerHTML = `
+        <strong>Perfiles Detectados:</strong> ${perfilesUnicos.join(", ")}<br><br>
+        <strong>Sugerencias:</strong><br>${sugerencias}
+      `;
     }
 
     async function exportarPDF() {
@@ -110,47 +136,13 @@
       doc.setFontSize(16);
       doc.text("Resumen de Ahorro con IA", 20, 20);
       doc.setFontSize(12);
-      doc.text(`Perfil: ${perfilFinal}`, 20, 30);
+      doc.text(`Perfiles detectados: ${[...new Set(perfiles)].join(", ")}`, 20, 30);
       doc.text(`Ahorro estimado a 2 años: ${ahorroTotal} minutos`, 20, 40);
-
-      const tareaSeleccionada = document.getElementById("tarea").value;
-      if (!tareaSeleccionada) {
-        alert("Por favor selecciona una tarea antes de exportar.");
-        return;
-      }
-
-      const [minutos, porcentaje] = tareaSeleccionada.split(",");
-      const sinIA = (parseInt(minutos) * 52 * 2);
-      const conIA = sinIA - ahorroTotal;
-
-      const canvas = document.createElement('canvas');
-      canvas.width = 400;
-      canvas.height = 200;
-      document.body.appendChild(canvas);
-
-      new Chart(canvas.getContext('2d'), {
-        type: 'bar',
-        data: {
-          labels: ['Sin IA', 'Con IA'],
-          datasets: [{
-            label: 'Minutos trabajados en 2 años',
-            data: [sinIA, conIA],
-            backgroundColor: ['#ff6b6b', '#1dd3b0']
-          }]
-        },
-        options: {
-          responsive: false,
-          plugins: { legend: { display: false } }
-        }
-      });
-
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      doc.addImage(canvas.toDataURL("image/png"), 'PNG', 20, 50, 160, 80);
-      document.body.removeChild(canvas);
 
       doc.save("resumen_ahorro_IA.pdf");
     }
   </script>
 </body>
 </html>
+
 
