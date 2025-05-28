@@ -1,106 +1,161 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Calculadora de Ahorro con IA</title>
- <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-  }
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
 
-  body {
-    min-height: 100vh;
-    font-family: 'Segoe UI', sans-serif;
-    background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center fixed;
-    background-size: cover;
-    color: #fff;
-    padding: 4vh 0;
-  }
+    body {
+      min-height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      padding: 4vh 0;
+    }
 
-  .container {
-    background-color: rgba(0, 0, 0, 0.4);
-    padding: 2em;
-    max-width: 700px;
-    width: 90%;
-    border-radius: 20px;
-    backdrop-filter: blur(6px);
-    box-shadow: 0 0 20px rgba(0,0,0,0.4);
-    margin: 0 auto;
-  }
+    .container {
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 2em;
+      max-width: 700px;
+      width: 90%;
+      border-radius: 20px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      margin: 0 auto;
+    }
 
-  h1 {
-    text-align: center;
-    color: white;
-    margin-bottom: 1em;
-  }
+    h1 {
+      text-align: center;
+      color: white;
+      margin-bottom: 1em;
+    }
 
-  label, .checkbox-label {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #fff;
-  }
+    label, .checkbox-label {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #fff;
+    }
 
-  .checkbox-group {
-    margin-top: 1em;
-  }
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1em;
+      margin-top: 1em;
+    }
 
-  .checkbox-group label {
-    display: block;
-    margin-bottom: 0.5em;
-    background-color: rgba(255,255,255,0.1);
-    padding: 0.5em;
-    border-radius: 10px;
-    cursor: pointer;
-  }
+    .checkbox-group label {
+      flex: 1 1 calc(50% - 1em);
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 1em;
+      border-radius: 15px;
+      cursor: pointer;
+      color: #fff;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 1em;
+      transition: background-color 0.3s, box-shadow 0.3s;
+      user-select: none;
+      position: relative;
+    }
 
-  input[type="checkbox"] {
-    margin-right: 1em;
-    transform: scale(1.3);
-  }
+    /* Ocultar checkbox real */
+    .checkbox-group input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
 
-  button {
-    width: 100%;
-    padding: 1em;
-    margin-top: 1em;
-    font-size: 1em;
-    border-radius: 10px;
-    border: none;
-    background-color: rgba(255, 255, 255, 0.15);
-    color: white;
-    font-weight: bold;
-    backdrop-filter: blur(8px);
-  }
+    /* Estilo cuando está seleccionado */
+    .checkbox-group input[type="checkbox"]:checked + span {
+      background-color: #4caf50;
+      box-shadow: 0 0 10px #4caf50aa;
+      color: white;
+      border-radius: 15px;
+      padding: 1em;
+      display: block;
+      flex: 1;
+    }
 
-  button:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    cursor: pointer;
-  }
+    button {
+      width: 100%;
+      padding: 1em;
+      margin-top: 1em;
+      font-size: 1em;
+      border-radius: 10px;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.15);
+      color: white;
+      font-weight: bold;
+      backdrop-filter: blur(8px);
+    }
 
-  #resultado, #perfil {
-    margin-top: 1em;
-    padding: 1em;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-  }
-</style>
+    button:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+    }
+
+    #resultado, #perfil {
+      margin-top: 1em;
+      padding: 1em;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-  <h1 style="text-align:center; color:white;">Descubre Cuánto Tiempo Puedes Ahorrar con IA</h1>
+    <h1 style="text-align:center; color:white;">Descubre Cuánto Tiempo Puedes Ahorrar con IA</h1>
     <label class="checkbox-label">Selecciona una o más tareas:</label>
     <div class="checkbox-group" id="tareas">
-      <label><input type="checkbox" value="300,60,Comunicador">Responder correos electrónicos</label>
-      <label><input type="checkbox" value="90,80,Comunicador">Agendar reuniones</label>
-      <label><input type="checkbox" value="180,70,Investigador">Buscar información</label>
-      <label><input type="checkbox" value="180,65,Analítico">Redactar documentos</label>
-      <label><input type="checkbox" value="60,90,Investigador">Transcribir reuniones</label>
-      <label><input type="checkbox" value="160,50,Productivo">Seguimiento de proyectos</label>
-      <label><input type="checkbox" value="250,75,Comunicador">Atención al cliente</label>
-      <label><input type="checkbox" value="120,50,Productivo">Edición de contenido</label>
-      <label><input type="checkbox" value="135,60,Comunicador">Publicaciones en RRSS</label>
-      <label><input type="checkbox" value="120,55,Analítico">Análisis de datos</label>
+      <label>
+        <input type="checkbox" value="300,60,Comunicador" />
+        <span>Responder correos electrónicos</span>
+      </label>
+      <label>
+        <input type="checkbox" value="90,80,Comunicador" />
+        <span>Agendar reuniones</span>
+      </label>
+      <label>
+        <input type="checkbox" value="180,70,Investigador" />
+        <span>Buscar información</span>
+      </label>
+      <label>
+        <input type="checkbox" value="180,65,Analítico" />
+        <span>Redactar documentos</span>
+      </label>
+      <label>
+        <input type="checkbox" value="60,90,Investigador" />
+        <span>Transcribir reuniones</span>
+      </label>
+      <label>
+        <input type="checkbox" value="160,50,Productivo" />
+        <span>Seguimiento de proyectos</span>
+      </label>
+      <label>
+        <input type="checkbox" value="250,75,Comunicador" />
+        <span>Atención al cliente</span>
+      </label>
+      <label>
+        <input type="checkbox" value="120,50,Productivo" />
+        <span>Edición de contenido</span>
+      </label>
+      <label>
+        <input type="checkbox" value="135,60,Comunicador" />
+        <span>Publicaciones en RRSS</span>
+      </label>
+      <label>
+        <input type="checkbox" value="120,55,Analítico" />
+        <span>Análisis de datos</span>
+      </label>
     </div>
 
     <div id="resultado"></div>
@@ -137,13 +192,13 @@
         const ahorro2anios = ahorro * 52 * 2;
         ahorroTotal += ahorro2anios;
         perfiles.push(perfilTipo);
-        resumen += `<li>${opt.parentElement.innerText}: <strong>${ahorro} min/sem</strong>, <strong>${ahorro2anios} min/2 años</strong></li>`;
+        resumen += `<li>${opt.parentElement.innerText.trim()}: <strong>${ahorro} min/sem</strong>, <strong>${ahorro2anios} min/2 años</strong></li>`;
       });
 
       resultado.innerHTML = `
         <strong>Ahorro estimado:</strong>
         <ul>${resumen}</ul>
-        <p><strong>Total estimado en 2 años:</strong> ${ahorroTotal} minutos</p>
+        <p><strong>Total estimado en 2 años:</strong> ${ahorroTotal.toFixed(2)} minutos</p>
       `;
 
       let desarrollo = {
@@ -170,13 +225,14 @@
       doc.text("Resumen de Ahorro con IA", 20, 20);
       doc.setFontSize(12);
       doc.text(`Perfiles detectados: ${[...new Set(perfiles)].join(", ")}`, 20, 30);
-      doc.text(`Ahorro estimado a 2 años: ${ahorroTotal} minutos`, 20, 40);
+      doc.text(`Ahorro estimado a 2 años: ${ahorroTotal.toFixed(2)} minutos`, 20, 40);
 
       doc.save("resumen_ahorro_IA.pdf");
     }
   </script>
 </body>
 </html>
+
 
 
 
