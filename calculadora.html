@@ -96,6 +96,7 @@
       border-radius: 10px;
     }
     #grafico {
+      display: none; /* oculto al inicio */
       margin-top: 1em;
       background-color: white;
       border-radius: 10px;
@@ -155,6 +156,7 @@
           chartInstance.destroy();
           chartInstance = null;
         }
+        document.getElementById('grafico').style.display = 'none'; // ocultar canvas
         return;
       }
 
@@ -198,6 +200,8 @@
     }
 
     function generarGrafico(labels, data) {
+      document.getElementById('grafico').style.display = 'block'; // mostrar canvas
+
       const ctx = document.getElementById('grafico').getContext('2d');
       if(chartInstance) {
         chartInstance.destroy();
@@ -232,24 +236,7 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
-      // Texto en PDF
       doc.setFontSize(16);
       doc.text("Resumen de Ahorro con IA", 20, 20);
       doc.setFontSize(12);
-      doc.text(`Perfiles detectados: ${[...new Set(perfiles)].join(", ")}`, 20, 30);
-      doc.text(`Ahorro estimado a 2 años: ${ahorroTotal.toFixed(2)} minutos`, 20, 40);
-
-      // Añadir gráfico
-      const canvas = document.getElementById('grafico');
-      const imgData = canvas.toDataURL('image/png');
-
-      // Ajustar imagen al PDF manteniendo proporción
-      const pdfWidth = doc.internal.pageSize.getWidth() - 40; // margen 20 por lado
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      doc.addImage(imgData, 'PNG', 20, 50, pdfWidth, pdfHeight);
-
-      doc.save('resumen_ahorro_IA.pdf');
-    }
-  </script>
-</body>
-</html>
+      doc.text(`Per
