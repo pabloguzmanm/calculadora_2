@@ -6,16 +6,11 @@
   <title>Calculadora de Ahorro con IA</title>
   <style>
     * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      margin: 0; padding: 0; box-sizing: border-box;
     }
-
     html, body {
-      height: 100%;
-      width: 100%;
+      height: 100%; width: 100%;
     }
-
     body {
       background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center fixed;
       background-size: cover;
@@ -26,7 +21,6 @@
       justify-content: center;
       padding: 4vh 2vw;
     }
-
     .container {
       background-color: rgba(0, 0, 0, 0.4);
       padding: 2em;
@@ -36,24 +30,20 @@
       backdrop-filter: blur(6px);
       box-shadow: 0 0 20px rgba(0,0,0,0.4);
     }
-
     h1 {
       text-align: center;
       margin-bottom: 1em;
     }
-
     .checkbox-label {
       font-size: 1.1em;
       font-weight: bold;
     }
-
     .checkbox-group {
       display: grid;
       gap: 1em;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       margin-top: 1em;
     }
-
     .checkbox-group label {
       background-color: rgba(255, 255, 255, 0.1);
       padding: 1em;
@@ -67,13 +57,11 @@
       position: relative;
       transition: background-color 0.3s, box-shadow 0.3s;
     }
-
     .checkbox-group input[type="checkbox"] {
       position: absolute;
       opacity: 0;
       pointer-events: none;
     }
-
     .checkbox-group input[type="checkbox"]:checked + span {
       background-color: #4caf50;
       box-shadow: 0 0 10px #4caf50aa;
@@ -84,7 +72,6 @@
       width: 100%;
       height: 100%;
     }
-
     button {
       width: 100%;
       padding: 1em;
@@ -98,19 +85,22 @@
       backdrop-filter: blur(8px);
       transition: background-color 0.3s;
     }
-
     button:hover {
       background-color: rgba(255, 255, 255, 0.3);
       cursor: pointer;
     }
-
     #resultado, #perfil {
       margin-top: 1em;
       padding: 1em;
       background-color: rgba(255, 255, 255, 0.1);
       border-radius: 10px;
     }
-
+    #grafico {
+      margin-top: 1em;
+      background-color: white;
+      border-radius: 10px;
+      padding: 10px;
+    }
     @media (max-width: 600px) {
       .checkbox-group {
         grid-template-columns: 1fr;
@@ -137,15 +127,18 @@
 
     <div id="resultado"></div>
     <div id="perfil"></div>
+    <canvas id="grafico" width="400" height="200"></canvas>
 
     <button onclick="calcularAhorro()">Calcular Ahorro</button>
     <button onclick="exportarPDF()">Exportar Resultado como PDF</button>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     let ahorroTotal = 0;
     let perfiles = [];
+    let chartInstance = null;
 
     function calcularAhorro() {
       const checks = document.querySelectorAll('#tareas input[type="checkbox"]:checked');
@@ -158,17 +151,26 @@
       if (checks.length === 0) {
         resultado.innerHTML = "";
         perfil.innerHTML = "";
+        if(chartInstance) {
+          chartInstance.destroy();
+          chartInstance = null;
+        }
         return;
       }
 
       let resumen = "";
+      let tareas = [];
+      let ahorros = [];
+
       checks.forEach(opt => {
         const [minutos, porcentaje, perfilTipo] = opt.value.split(",");
         const ahorro = (parseInt(minutos) * parseInt(porcentaje)) / 100;
         const ahorro2anios = ahorro * 52 * 2;
         ahorroTotal += ahorro2anios;
         perfiles.push(perfilTipo);
-        resumen += `<li>${opt.parentElement.innerText.trim()}: <strong>${ahorro} min/sem</strong>, <strong>${ahorro2anios} min/2 años</strong></li>`;
+        tareas.push(opt.parentElement.innerText.trim());
+        ahorros.push(ahorro2anios);
+        resumen += `<li>${opt.parentElement.innerText.trim()}: <strong>${ahorro.toFixed(2)} min/sem</strong>, <strong>${ahorro2anios.toFixed(2)} min/2 años</strong></li>`;
       });
 
       resultado.innerHTML = `
@@ -191,19 +193,62 @@
         <strong>Perfiles Detectados:</strong> ${perfilesUnicos.join(", ")}<br><br>
         <strong>Sugerencias:</strong><br>${sugerencias}
       `;
+
+      generarGrafico(tareas, ahorros);
+    }
+
+    function generarGrafico(labels, data) {
+      const ctx = document.getElementById('grafico').getContext('2d');
+      if(chartInstance) {
+        chartInstance.destroy();
+      }
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Ahorro en 2 años (minutos)',
+            data,
+            backgroundColor: 'rgba(75, 192, 192, 0.7)'
+          }]
+        },
+        options: {
+          responsive: false,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
     }
 
     async function exportarPDF() {
+      if (!chartInstance) {
+        alert("Por favor, primero calcula el ahorro para generar el gráfico.");
+        return;
+      }
+
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
+      // Texto en PDF
       doc.setFontSize(16);
       doc.text("Resumen de Ahorro con IA", 20, 20);
       doc.setFontSize(12);
       doc.text(`Perfiles detectados: ${[...new Set(perfiles)].join(", ")}`, 20, 30);
       doc.text(`Ahorro estimado a 2 años: ${ahorroTotal.toFixed(2)} minutos`, 20, 40);
 
-      doc.save("resumen_ahorro_IA.pdf");
+      // Añadir gráfico
+      const canvas = document.getElementById('grafico');
+      const imgData = canvas.toDataURL('image/png');
+
+      // Ajustar imagen al PDF manteniendo proporción
+      const pdfWidth = doc.internal.pageSize.getWidth() - 40; // margen 20 por lado
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      doc.addImage(imgData, 'PNG', 20, 50, pdfWidth, pdfHeight);
+
+      doc.save('resumen_ahorro_IA.pdf');
     }
   </script>
 </body>
