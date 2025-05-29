@@ -228,37 +228,56 @@
     }
 
     async function exportarPDF() {
-      if (!chartInstance) {
-        alert("Por favor, primero calcula el ahorro para generar el gráfico.");
-        return;
-      }
+  if (!chartInstance) {
+    alert("Por favor, primero calcula el ahorro para generar el gráfico.");
+    return;
+  }
 
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
 
-      const resumenHTML = document.getElementById("resultado").innerHTML;
-      const perfilHTML = document.getElementById("perfil").innerHTML;
+  // Título destacado
+  doc.setFontSize(16);
+  doc.setFont("helvetica", "bold");
+  doc.text("Resumen de Ahorro con Inteligencia Artificial", 10, 15);
 
-      const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = resumenHTML + "<br><br>" + perfilHTML;
-      const text = tempDiv.innerText;
+  // Recuperar textos
+  const resumenHTML = document.getElementById("resultado").innerHTML;
+  const perfilHTML = document.getElementById("perfil").innerHTML;
 
-      doc.setFontSize(14);
-      doc.text("Resumen de Ahorro con IA", 10, 10);
-      doc.setFontSize(10);
-      const lineas = doc.splitTextToSize(text, 180);
-      doc.text(lineas, 10, 20);
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = resumenHTML + "<br><br>" + perfilHTML;
+  const text = tempDiv.innerText;
 
-      const canvas = document.getElementById("grafico");
-      const imgData = canvas.toDataURL("image/png");
+  // Texto con formato más compacto y legible
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  const lines = doc.splitTextToSize(text, 180);
+  doc.text(lines, 10, 25);
 
-      doc.addPage();
-      doc.setFontSize(14);
-      doc.text("Gráfico de Ahorro", 10, 10);
-      doc.addImage(imgData, 'PNG', 10, 20, 180, 100);
+  // Insertar gráfico más compacto
+  const canvas = document.getElementById("grafico");
+  const imgData = canvas.toDataURL("image/png");
 
-      doc.save("ahorro_con_IA.pdf");
-    }
+  // Verifica si el contenido de texto ya llenó la página
+  const yOffset = doc.lastAutoTable ? doc.lastAutoTable.finalY : 25 + lines.length * 5;
+  const espacioRestante = 297 - yOffset;
+
+  if (espacioRestante > 100) {
+    // Suficiente espacio para el gráfico en la misma página
+    doc.addImage(imgData, 'PNG', 10, yOffset + 10, 150, 80);
+  } else {
+    // Pasa el gráfico a una segunda página si no cabe
+    doc.addPage();
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("Gráfico de Ahorro", 10, 15);
+    doc.addImage(imgData, 'PNG', 10, 25, 150, 80);
+  }
+
+  doc.save("ahorro_con_IA.pdf");
+}
+
   </script>
 </body>
 </html>
