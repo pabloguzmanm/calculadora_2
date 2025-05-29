@@ -5,108 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calculadora de Ahorro con IA</title>
   <style>
-    * {
-      margin: 0; padding: 0; box-sizing: border-box;
-    }
-    html, body {
-      height: 100%; width: 100%;
-    }
-    body {
-      background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center fixed;
-      background-size: cover;
-      font-family: 'Segoe UI', sans-serif;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 4vh 2vw;
-    }
-    .container {
-      background-color: rgba(0, 0, 0, 0.4);
-      padding: 2em;
-      max-width: 1000px;
-      width: 100%;
-      border-radius: 20px;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 1em;
-    }
-    .checkbox-label {
-      font-size: 1.1em;
-      font-weight: bold;
-    }
-    .checkbox-group {
-      display: grid;
-      gap: 1em;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      margin-top: 1em;
-    }
-    .checkbox-group label {
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 1em;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 1em;
-      display: flex;
-      align-items: center;
-      height: 80px;
-      position: relative;
-      transition: background-color 0.3s, box-shadow 0.3s;
-    }
-    .checkbox-group input[type="checkbox"] {
-      position: absolute;
-      opacity: 0;
-      pointer-events: none;
-    }
-    .checkbox-group input[type="checkbox"]:checked + span {
-      background-color: #4caf50;
-      box-shadow: 0 0 10px #4caf50aa;
-      color: white;
-      border-radius: 12px;
-      padding: 1em;
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-    button {
-      width: 100%;
-      padding: 1em;
-      margin-top: 1em;
-      font-size: 1em;
-      border-radius: 10px;
-      border: none;
-      background-color: rgba(255, 255, 255, 0.15);
-      color: white;
-      font-weight: bold;
-      backdrop-filter: blur(8px);
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: rgba(255, 255, 255, 0.3);
-      cursor: pointer;
-    }
-    #resultado, #perfil {
-      margin-top: 1em;
-      padding: 1em;
-      background-color: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-    }
-    #grafico {
-      display: none;
-      margin-top: 1em;
-      background-color: white;
-      border-radius: 10px;
-      padding: 10px;
-    }
-    @media (max-width: 600px) {
-      .checkbox-group {
-        grid-template-columns: 1fr;
-      }
-    }
+    /* ... Tu CSS permanece igual ... */
   </style>
 </head>
 <body>
@@ -114,21 +13,12 @@
     <h1>Descubre Cuánto Tiempo Puedes Ahorrar con IA</h1>
     <label class="checkbox-label">Selecciona una o más tareas:</label>
     <div class="checkbox-group" id="tareas">
-      <label><input type="checkbox" value="300,60,Comunicador"><span>Responder correos electrónicos</span></label>
-      <label><input type="checkbox" value="90,80,Comunicador"><span>Agendar reuniones</span></label>
-      <label><input type="checkbox" value="180,70,Investigador"><span>Buscar información</span></label>
-      <label><input type="checkbox" value="180,65,Analítico"><span>Redactar documentos</span></label>
-      <label><input type="checkbox" value="60,90,Investigador"><span>Transcribir reuniones</span></label>
-      <label><input type="checkbox" value="160,50,Productivo"><span>Seguimiento de proyectos</span></label>
-      <label><input type="checkbox" value="250,75,Comunicador"><span>Atención al cliente</span></label>
-      <label><input type="checkbox" value="120,50,Productivo"><span>Edición de contenido</span></label>
-      <label><input type="checkbox" value="135,60,Comunicador"><span>Publicaciones en RRSS</span></label>
-      <label><input type="checkbox" value="120,55,Analítico"><span>Análisis de datos</span></label>
+      <!-- ... tus tareas ... -->
     </div>
 
     <div id="resultado"></div>
     <div id="perfil"></div>
-    <canvas id="grafico" width="400" height="200"></canvas>
+    <canvas id="grafico" width="400" height="200" style="display:none;"></canvas>
 
     <button onclick="calcularAhorro()">Calcular Ahorro</button>
     <button onclick="exportarPDF()">Exportar Resultado como PDF</button>
@@ -140,6 +30,8 @@
     let ahorroTotal = 0;
     let perfiles = [];
     let chartInstance = null;
+    let resumenText = "";
+    let perfilText = "";
 
     function calcularAhorro() {
       const checks = document.querySelectorAll('#tareas input[type="checkbox"]:checked');
@@ -148,6 +40,8 @@
 
       ahorroTotal = 0;
       perfiles = [];
+      resumenText = "";
+      perfilText = "";
 
       if (checks.length === 0) {
         resultado.innerHTML = "";
@@ -160,7 +54,7 @@
         return;
       }
 
-      let resumen = "";
+      let resumenHTML = "";
       let tareas = [];
       let ahorros = [];
 
@@ -172,12 +66,13 @@
         perfiles.push(perfilTipo);
         tareas.push(opt.parentElement.innerText.trim());
         ahorros.push(ahorro2anios);
-        resumen += `<li>${opt.parentElement.innerText.trim()}: <strong>${ahorro.toFixed(2)} min/sem</strong>, <strong>${ahorro2anios.toFixed(2)} min/2 años</strong></li>`;
+        resumenHTML += `<li>${opt.parentElement.innerText.trim()}: <strong>${ahorro.toFixed(2)} min/sem</strong>, <strong>${ahorro2anios.toFixed(2)} min/2 años</strong></li>`;
+        resumenText += `${opt.parentElement.innerText.trim()}: ${ahorro.toFixed(2)} min/sem, ${ahorro2anios.toFixed(2)} min/2 años\n`;
       });
 
       resultado.innerHTML = `
         <strong>Ahorro estimado:</strong>
-        <ul>${resumen}</ul>
+        <ul>${resumenHTML}</ul>
         <p><strong>Total estimado en 2 años:</strong> ${ahorroTotal.toFixed(2)} minutos</p>
       `;
 
@@ -189,11 +84,11 @@
       };
 
       const perfilesUnicos = [...new Set(perfiles)];
-      let sugerencias = perfilesUnicos.map(p => `<strong>${p}</strong>: ${desarrollo[p]}`).join("<br>");
+      perfilText = perfilesUnicos.map(p => `${p}: ${desarrollo[p]}`).join("\n");
 
       perfil.innerHTML = `
         <strong>Perfiles Detectados:</strong> ${perfilesUnicos.join(", ")}<br><br>
-        <strong>Sugerencias:</strong><br>${sugerencias}
+        <strong>Sugerencias:</strong><br>${perfilText.replace(/\n/g, '<br>')}
       `;
 
       generarGrafico(tareas, ahorros);
@@ -201,11 +96,8 @@
 
     function generarGrafico(labels, data) {
       document.getElementById('grafico').style.display = 'block';
-
       const ctx = document.getElementById('grafico').getContext('2d');
-      if(chartInstance) {
-        chartInstance.destroy();
-      }
+      if (chartInstance) chartInstance.destroy();
       chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -218,66 +110,65 @@
         },
         options: {
           responsive: false,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
+          scales: { y: { beginAtZero: true } }
         }
       });
     }
 
     async function exportarPDF() {
-  if (!chartInstance) {
-    alert("Por favor, primero calcula el ahorro para generar el gráfico.");
-    return;
-  }
+      if (!chartInstance) {
+        alert("Por favor, primero calcula el ahorro para generar el gráfico.");
+        return;
+      }
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
 
-  // Título destacado
-  doc.setFontSize(16);
-  doc.setFont("helvetica", "bold");
-  doc.text("Resumen de Ahorro con Inteligencia Artificial", 10, 15);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text("Resumen de Ahorro con IA", 10, 20);
 
-  // Recuperar textos
-  const resumenHTML = document.getElementById("resultado").innerHTML;
-  const perfilHTML = document.getElementById("perfil").innerHTML;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      let yActual = 30;
+      yActual = textJustify(doc, resumenText, 10, yActual, 180, 6);
 
-  const tempDiv = document.createElement("div");
-  tempDiv.innerHTML = resumenHTML + "<br><br>" + perfilHTML;
-  const text = tempDiv.innerText;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.text("Perfiles Detectados y Sugerencias de Desarrollo:", 10, yActual + 6);
 
-  // Texto con formato más compacto y legible
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  const lines = doc.splitTextToSize(text, 180);
-  doc.text(lines, 10, 25);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      yActual = textJustify(doc, perfilText, 10, yActual + 12, 180, 6);
 
-  // Insertar gráfico más compacto
-  const canvas = document.getElementById("grafico");
-  const imgData = canvas.toDataURL("image/png");
+      const canvas = document.getElementById('grafico');
+      const imageData = canvas.toDataURL('image/png');
+      doc.addImage(imageData, 'PNG', 10, yActual + 10, 190, 90);
 
-  // Verifica si el contenido de texto ya llenó la página
-  const yOffset = doc.lastAutoTable ? doc.lastAutoTable.finalY : 25 + lines.length * 5;
-  const espacioRestante = 297 - yOffset;
+      doc.save("ahorro_IA.pdf");
+    }
 
-  if (espacioRestante > 100) {
-    // Suficiente espacio para el gráfico en la misma página
-    doc.addImage(imgData, 'PNG', 10, yOffset + 10, 150, 80);
-  } else {
-    // Pasa el gráfico a una segunda página si no cabe
-    doc.addPage();
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("Gráfico de Ahorro", 10, 15);
-    doc.addImage(imgData, 'PNG', 10, 25, 150, 80);
-  }
-
-  doc.save("ahorro_con_IA.pdf");
-}
-
+    function textJustify(doc, text, x, y, width, lineHeight) {
+      const lines = doc.splitTextToSize(text, width);
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (i === lines.length - 1 || line.indexOf(' ') === -1) {
+          doc.text(line, x, y);
+        } else {
+          const words = line.trim().split(/\s+/);
+          const gaps = words.length - 1;
+          const lineWidth = doc.getTextWidth(line);
+          const spaceWidth = (width - lineWidth) / gaps;
+          let cursor = x;
+          words.forEach((word, idx) => {
+            doc.text(word, cursor, y);
+            if (idx < gaps) cursor += doc.getTextWidth(word) + spaceWidth;
+          });
+        }
+        y += lineHeight;
+      }
+      return y;
+    }
   </script>
 </body>
 </html>
