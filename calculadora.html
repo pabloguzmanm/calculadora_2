@@ -12,11 +12,10 @@
     }
 
     html, body {
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-}
+      height: 100%;
+      width: 100%;
+    }
+
     body {
       background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center fixed;
       background-size: cover;
@@ -25,6 +24,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 4vh 2vw;
     }
 
     .container {
@@ -119,7 +119,7 @@
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="exportable">
     <h1>Descubre Cuánto Tiempo Puedes Ahorrar con IA</h1>
     <label class="checkbox-label">Selecciona una o más tareas:</label>
     <div class="checkbox-group" id="tareas">
@@ -142,7 +142,11 @@
     <button onclick="exportarPDF()">Exportar Resultado como PDF</button>
   </div>
 
+  <!-- Librerías -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- Funcionalidad -->
   <script>
     let ahorroTotal = 0;
     let perfiles = [];
@@ -168,14 +172,14 @@
         const ahorro2anios = ahorro * 52 * 2;
         ahorroTotal += ahorro2anios;
         perfiles.push(perfilTipo);
-        resumen += <li>${opt.parentElement.innerText.trim()}: <strong>${ahorro} min/sem</strong>, <strong>${ahorro2anios} min/2 años</strong></li>;
+        resumen += `<li>${opt.parentElement.innerText.trim()}: <strong>${ahorro} min/sem</strong>, <strong>${ahorro2anios} min/2 años</strong></li>`;
       });
 
-      resultado.innerHTML = 
+      resultado.innerHTML = `
         <strong>Ahorro estimado:</strong>
         <ul>${resumen}</ul>
         <p><strong>Total estimado en 2 años:</strong> ${ahorroTotal.toFixed(2)} minutos</p>
-      ;
+      `;
 
       let desarrollo = {
         "Analítico": "Cursos en Power BI, Excel avanzado, automatización.",
@@ -185,25 +189,45 @@
       };
 
       const perfilesUnicos = [...new Set(perfiles)];
-      let sugerencias = perfilesUnicos.map(p => <strong>${p}</strong>: ${desarrollo[p]}).join("<br>");
+      let sugerencias = perfilesUnicos.map(p => `<strong>${p}</strong>: ${desarrollo[p]}`).join("<br>");
 
-      perfil.innerHTML = 
+      perfil.innerHTML = `
         <strong>Perfiles Detectados:</strong> ${perfilesUnicos.join(", ")}<br><br>
         <strong>Sugerencias:</strong><br>${sugerencias}
-      ;
+      `;
     }
 
     async function exportarPDF() {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+      const container = document.querySelector(".container");
 
-      doc.setFontSize(16);
-      doc.text("Resumen de Ahorro con IA", 20, 20);
-      doc.setFontSize(12);
-      doc.text(Perfiles detectados: ${[...new Set(perfiles)].join(", ")}, 20, 30);
-      doc.text(Ahorro estimado a 2 años: ${ahorroTotal.toFixed(2)} minutos, 20, 40);
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        useCORS: true,
+      });
 
-      doc.save("resumen_ahorro_IA.pdf");
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      let position = 0;
+      let heightLeft = imgHeight;
+
+      while (heightLeft > 0) {
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pdfHeight;
+        position -= pdfHeight;
+        if (heightLeft > 0) {
+          pdf.addPage();
+        }
+      }
+
+      pdf.save("resumen_ahorro_IA.pdf");
     }
   </script>
 </body>
