@@ -1,83 +1,90 @@
-<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calculadora de Ahorro con IA</title>
   <style>
-    html, body {
-      height: 100vh;
+    * {
       margin: 0;
       padding: 0;
-      overflow-x: hidden;
+      box-sizing: border-box;
     }
 
+    html {
+      height: 100%;
+      width: 100%
+    }
     body {
-      height: 100vh;
       background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center fixed;
       background-size: cover;
       font-family: 'Segoe UI', sans-serif;
       color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4vh 2vw;
+      height: 100%;
+      width: 100%
     }
 
     .container {
       background-color: rgba(0, 0, 0, 0.4);
-      padding: 2em 1em;
-      max-width: 700px;
-      width: 90%;
+      padding: 2em;
+      max-width: 1000px;
+      width: 100%;
       border-radius: 20px;
       backdrop-filter: blur(6px);
       box-shadow: 0 0 20px rgba(0,0,0,0.4);
-      margin: 4vh auto;
     }
 
-    /* El resto de tu CSS para estilos sigue igual... */
     h1 {
       text-align: center;
-      color: white;
       margin-bottom: 1em;
     }
-    label, .checkbox-label {
-      font-size: 1.2em;
+
+    .checkbox-label {
+      font-size: 1.1em;
       font-weight: bold;
-      color: #fff;
     }
+
     .checkbox-group {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
       gap: 1em;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       margin-top: 1em;
     }
+
     .checkbox-group label {
-      flex: 1 1 calc(50% - 1em);
       background-color: rgba(255, 255, 255, 0.1);
       padding: 1em;
-      border-radius: 15px;
+      border-radius: 12px;
       cursor: pointer;
-      color: #fff;
-      font-weight: bold;
+      font-weight: 600;
+      font-size: 1em;
       display: flex;
       align-items: center;
-      gap: 1em;
-      transition: background-color 0.3s, box-shadow 0.3s;
-      user-select: none;
+      height: 80px;
       position: relative;
+      transition: background-color 0.3s, box-shadow 0.3s;
     }
+
     .checkbox-group input[type="checkbox"] {
       position: absolute;
       opacity: 0;
-      cursor: pointer;
-      height: 0;
-      width: 0;
+      pointer-events: none;
     }
+
     .checkbox-group input[type="checkbox"]:checked + span {
       background-color: #4caf50;
       box-shadow: 0 0 10px #4caf50aa;
       color: white;
-      border-radius: 15px;
+      border-radius: 12px;
       padding: 1em;
       display: block;
-      flex: 1;
+      width: 100%;
+      height: 100%;
     }
+
     button {
       width: 100%;
       padding: 1em;
@@ -91,15 +98,23 @@
       backdrop-filter: blur(8px);
       transition: background-color 0.3s;
     }
+
     button:hover {
       background-color: rgba(255, 255, 255, 0.3);
       cursor: pointer;
     }
+
     #resultado, #perfil {
       margin-top: 1em;
       padding: 1em;
       background-color: rgba(255, 255, 255, 0.1);
       border-radius: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .checkbox-group {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -108,14 +123,88 @@
     <h1>Descubre Cuánto Tiempo Puedes Ahorrar con IA</h1>
     <label class="checkbox-label">Selecciona una o más tareas:</label>
     <div class="checkbox-group" id="tareas">
-      <!-- Tus checkboxes aquí -->
+      <label><input type="checkbox" value="300,60,Comunicador"><span>Responder correos electrónicos</span></label>
+      <label><input type="checkbox" value="90,80,Comunicador"><span>Agendar reuniones</span></label>
+      <label><input type="checkbox" value="180,70,Investigador"><span>Buscar información</span></label>
+      <label><input type="checkbox" value="180,65,Analítico"><span>Redactar documentos</span></label>
+      <label><input type="checkbox" value="60,90,Investigador"><span>Transcribir reuniones</span></label>
+      <label><input type="checkbox" value="160,50,Productivo"><span>Seguimiento de proyectos</span></label>
+      <label><input type="checkbox" value="250,75,Comunicador"><span>Atención al cliente</span></label>
+      <label><input type="checkbox" value="120,50,Productivo"><span>Edición de contenido</span></label>
+      <label><input type="checkbox" value="135,60,Comunicador"><span>Publicaciones en RRSS</span></label>
+      <label><input type="checkbox" value="120,55,Analítico"><span>Análisis de datos</span></label>
     </div>
+
     <div id="resultado"></div>
     <div id="perfil"></div>
+
     <button onclick="calcularAhorro()">Calcular Ahorro</button>
     <button onclick="exportarPDF()">Exportar Resultado como PDF</button>
   </div>
 
-  <!-- Script JS igual que antes -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    let ahorroTotal = 0;
+    let perfiles = [];
+
+    function calcularAhorro() {
+      const checks = document.querySelectorAll('#tareas input[type="checkbox"]:checked');
+      const resultado = document.getElementById("resultado");
+      const perfil = document.getElementById("perfil");
+
+      ahorroTotal = 0;
+      perfiles = [];
+
+      if (checks.length === 0) {
+        resultado.innerHTML = "";
+        perfil.innerHTML = "";
+        return;
+      }
+
+      let resumen = "";
+      checks.forEach(opt => {
+        const [minutos, porcentaje, perfilTipo] = opt.value.split(",");
+        const ahorro = (parseInt(minutos) * parseInt(porcentaje)) / 100;
+        const ahorro2anios = ahorro * 52 * 2;
+        ahorroTotal += ahorro2anios;
+        perfiles.push(perfilTipo);
+        resumen += `<li>${opt.parentElement.innerText.trim()}: <strong>${ahorro} min/sem</strong>, <strong>${ahorro2anios} min/2 años</strong></li>`;
+      });
+
+      resultado.innerHTML = `
+        <strong>Ahorro estimado:</strong>
+        <ul>${resumen}</ul>
+        <p><strong>Total estimado en 2 años:</strong> ${ahorroTotal.toFixed(2)} minutos</p>
+      `;
+
+      let desarrollo = {
+        "Analítico": "Cursos en Power BI, Excel avanzado, automatización.",
+        "Comunicador": "Storytelling, persuasión, liderazgo de equipos.",
+        "Productivo": "Notion, metodologías ágiles, gestión personal.",
+        "Investigador": "Lectura crítica, síntesis, herramientas de búsqueda."
+      };
+
+      const perfilesUnicos = [...new Set(perfiles)];
+      let sugerencias = perfilesUnicos.map(p => `<strong>${p}</strong>: ${desarrollo[p]}`).join("<br>");
+
+      perfil.innerHTML = `
+        <strong>Perfiles Detectados:</strong> ${perfilesUnicos.join(", ")}<br><br>
+        <strong>Sugerencias:</strong><br>${sugerencias}
+      `;
+    }
+
+    async function exportarPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(16);
+      doc.text("Resumen de Ahorro con IA", 20, 20);
+      doc.setFontSize(12);
+      doc.text(`Perfiles detectados: ${[...new Set(perfiles)].join(", ")}`, 20, 30);
+      doc.text(`Ahorro estimado a 2 años: ${ahorroTotal.toFixed(2)} minutos`, 20, 40);
+
+      doc.save("resumen_ahorro_IA.pdf");
+    }
+  </script>
 </body>
 </html>
