@@ -111,6 +111,10 @@
       border-radius: 10px;
     }
 
+    #grafico {
+      margin-top: 1em;
+    }
+
     @media (max-width: 600px) {
       .checkbox-group {
         grid-template-columns: 1fr;
@@ -119,7 +123,7 @@
   </style>
 </head>
 <body>
-  <div class="container" id="exportable">
+  <div class="container" id="contenido">
     <h1>Descubre Cuánto Tiempo Puedes Ahorrar con IA</h1>
     <label class="checkbox-label">Selecciona una o más tareas:</label>
     <div class="checkbox-group" id="tareas">
@@ -137,16 +141,15 @@
 
     <div id="resultado"></div>
     <div id="perfil"></div>
+    <canvas id="grafico" width="400" height="200"></canvas>
 
     <button onclick="calcularAhorro()">Calcular Ahorro</button>
     <button onclick="exportarPDF()">Exportar Resultado como PDF</button>
   </div>
 
-  <!-- Librerías -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <!-- Funcionalidad -->
   <script>
     let ahorroTotal = 0;
     let perfiles = [];
@@ -166,12 +169,17 @@
       }
 
       let resumen = "";
+      let tareas = [];
+      let ahorros = [];
+
       checks.forEach(opt => {
         const [minutos, porcentaje, perfilTipo] = opt.value.split(",");
         const ahorro = (parseInt(minutos) * parseInt(porcentaje)) / 100;
         const ahorro2anios = ahorro * 52 * 2;
         ahorroTotal += ahorro2anios;
         perfiles.push(perfilTipo);
+        tareas.push(opt.parentElement.innerText.trim());
+        ahorros.push(ahorro2anios);
         resumen += `<li>${opt.parentElement.innerText.trim()}: <strong>${ahorro} min/sem</strong>, <strong>${ahorro2anios} min/2 años</strong></li>`;
       });
 
@@ -195,39 +203,52 @@
         <strong>Perfiles Detectados:</strong> ${perfilesUnicos.join(", ")}<br><br>
         <strong>Sugerencias:</strong><br>${sugerencias}
       `;
+
+      generarGrafico(tareas, ahorros);
+    }
+
+    function generarGrafico(labels, data) {
+      const ctx = document.getElementById('grafico').getContext('2d');
+      if (window.myChart) {
+        window.myChart.destroy();
+      }
+      window.myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Ahorro en 2 años (minutos)',
+            data,
+            backgroundColor: 'rgba(75, 192, 192, 0.6)'
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
     }
 
     async function exportarPDF() {
       const { jsPDF } = window.jspdf;
-      const container = document.querySelector(".container");
+      const contenido = document.getElementById('contenido');
 
-      const canvas = await html2canvas(container, {
-        scale: 2,
-        useCORS: true,
+      const canvas = await html2canvas(contenido, {
+        scale: 2
       });
+      const imgData = canvas.toDataURL('image/png');
 
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgProps = pdf.getImageProperties(imgData);
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-      const imgWidth = pdfWidth;
-      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      let position = 0;
-      let heightLeft = imgHeight;
-
-      while (heightLeft > 0) {
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pdfHeight;
-        position -= pdfHeight;
-        if (heightLeft > 0) {
-          pdf.addPage();
-        }
-      }
-
-      pdf.save("resumen_ahorro_IA.pdf");
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save('resumen_ahorro_IA.pdf');
     }
   </script>
 </body>
