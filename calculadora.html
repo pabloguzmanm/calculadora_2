@@ -1,258 +1,213 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculadora de Ahorro con IA</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Ahorro con IA</title>
+<style>
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+     body {
       margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-    .checkbox-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    .checkbox-label {
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-    button {
-      margin-top: 10px;
-      margin-right: 10px;
-      padding: 10px 15px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-  </style>
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+}
+
+body {
+background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center fixed;
+background-size: cover;
+font-family: 'Segoe UI', sans-serif;
+color: #fff;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 4vh 2vw;
+}
+
+.container {
+background-color: rgba(0, 0, 0, 0.4);
+padding: 2em;
+max-width: 1000px;
+width: 100%;
+border-radius: 20px;
+backdrop-filter: blur(6px);
+box-shadow: 0 0 20px rgba(0,0,0,0.4);
+}
+
+h1 {
+text-align: center;
+margin-bottom: 1em;
+}
+
+.checkbox-label {
+font-size: 1.1em;
+font-weight: bold;
+}
+
+.checkbox-group {
+display: grid;
+gap: 1em;
+grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+margin-top: 1em;
+}
+
+.checkbox-group label {
+background-color: rgba(255, 255, 255, 0.1);
+padding: 1em;
+border-radius: 12px;
+cursor: pointer;
+font-weight: 600;
+font-size: 1em;
+display: flex;
+align-items: center;
+height: 80px;
+position: relative;
+transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.checkbox-group input[type="checkbox"] {
+position: absolute;
+opacity: 0;
+pointer-events: none;
+}
+
+.checkbox-group input[type="checkbox"]:checked + span {
+background-color: #4caf50;
+box-shadow: 0 0 10px #4caf50aa;
+color: white;
+border-radius: 12px;
+padding: 1em;
+display: block;
+width: 100%;
+height: 100%;
+}
+
+button {
+width: 100%;
+padding: 1em;
+margin-top: 1em;
+font-size: 1em;
+border-radius: 10px;
+border: none;
+background-color: rgba(255, 255, 255, 0.15);
+color: white;
+font-weight: bold;
+backdrop-filter: blur(8px);
+transition: background-color 0.3s;
+}
+
+button:hover {
+background-color: rgba(255, 255, 255, 0.3);
+cursor: pointer;
+}
+
+#resultado, #perfil {
+margin-top: 1em;
+padding: 1em;
+background-color: rgba(255, 255, 255, 0.1);
+border-radius: 10px;
+}
+
+@media (max-width: 600px) {
+.checkbox-group {
+grid-template-columns: 1fr;
+}
+}
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>Descubre Cuánto Tiempo Puedes Ahorrar con IA</h1>
-    <label class="checkbox-label">Selecciona una o más tareas:</label>
-    <div class="checkbox-group" id="tareas">
-      <label><input type="checkbox" value="60,30,Analítico"> Generar informes automáticamente</label>
-      <label><input type="checkbox" value="45,40,Productivo"> Organizar agenda con IA</label>
-      <label><input type="checkbox" value="30,50,Comunicador"> Redactar correos con IA</label>
-      <label><input type="checkbox" value="90,20,Investigador"> Buscar información en internet</label>
-    </div>
+<div class="container">
+<h1>Descubre Cuánto Tiempo Puedes Ahorrar con IA</h1>
+<label class="checkbox-label">Selecciona una o más tareas:</label>
+<div class="checkbox-group" id="tareas">
+<label><input type="checkbox" value="300,60,Comunicador"><span>Responder correos electrónicos</span></label>
+<label><input type="checkbox" value="90,80,Comunicador"><span>Agendar reuniones</span></label>
+<label><input type="checkbox" value="180,70,Investigador"><span>Buscar información</span></label>
+<label><input type="checkbox" value="180,65,Analítico"><span>Redactar documentos</span></label>
+<label><input type="checkbox" value="60,90,Investigador"><span>Transcribir reuniones</span></label>
+<label><input type="checkbox" value="160,50,Productivo"><span>Seguimiento de proyectos</span></label>
+<label><input type="checkbox" value="250,75,Comunicador"><span>Atención al cliente</span></label>
+<label><input type="checkbox" value="120,50,Productivo"><span>Edición de contenido</span></label>
+<label><input type="checkbox" value="135,60,Comunicador"><span>Publicaciones en RRSS</span></label>
+<label><input type="checkbox" value="120,55,Analítico"><span>Análisis de datos</span></label>
+</div>
 
-    <div id="resultado"></div>
-    <div id="perfil"></div>
-    <canvas id="grafico" width="400" height="200" style="display:none;"></canvas>
+<div id="resultado"></div>
+<div id="perfil"></div>
 
-    <button onclick="calcularAhorro()">Calcular Ahorro</button>
-    <button onclick="exportarPDF()">Exportar Resultado como PDF</button>
-  </div>
+<button onclick="calcularAhorro()">Calcular Ahorro</button>
+<button onclick="exportarPDF()">Exportar Resultado como PDF</button>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
-    let ahorroTotal = 0;
-    let perfiles = [];
-    let chartInstance = null;
-    let resumenText = "";
-    let perfilText = "";
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+let ahorroTotal = 0;
+let perfiles = [];
 
-    function calcularAhorro() {
-      const checks = document.querySelectorAll('#tareas input[type="checkbox"]:checked');
-      const resultado = document.getElementById("resultado");
-      const perfil = document.getElementById("perfil");
+function calcularAhorro() {
+const checks = document.querySelectorAll('#tareas input[type="checkbox"]:checked');
+const resultado = document.getElementById("resultado");
+const perfil = document.getElementById("perfil");
 
-      ahorroTotal = 0;
-      perfiles = [];
-      resumenText = "";
-      perfilText = "";
+ahorroTotal = 0;
+perfiles = [];
 
-      if (checks.length === 0) {
-        resultado.innerHTML = "";
-        perfil.innerHTML = "";
-        if(chartInstance) {
-          chartInstance.destroy();
-          chartInstance = null;
-        }
-        document.getElementById('grafico').style.display = 'none';
-        return;
-      }
+if (checks.length === 0) {
+resultado.innerHTML = "";
+perfil.innerHTML = "";
+return;
+}
 
-      let resumenHTML = "";
-      let tareas = [];
-      let ahorros = [];
+let resumen = "";
+checks.forEach(opt => {
+const [minutos, porcentaje, perfilTipo] = opt.value.split(",");
+const ahorro = (parseInt(minutos) * parseInt(porcentaje)) / 100;
+const ahorro2anios = ahorro * 52 * 2;
+ahorroTotal += ahorro2anios;
+perfiles.push(perfilTipo);
+resumen += `<li>${opt.parentElement.innerText.trim()}: <strong>${ahorro} min/sem</strong>, <strong>${ahorro2anios} min/2 años</strong></li>`;
+});
 
-      checks.forEach(opt => {
-        const [minutos, porcentaje, perfilTipo] = opt.value.split(",");
-        const ahorro = (parseInt(minutos) * parseInt(porcentaje)) / 100;
-        const ahorro2anios = ahorro * 52 * 2;
-        ahorroTotal += ahorro2anios;
-        perfiles.push(perfilTipo);
-        tareas.push(opt.parentElement.innerText.trim());
-        ahorros.push(ahorro2anios);
-        resumenHTML += `<li>${opt.parentElement.innerText.trim()}: <strong>${ahorro.toFixed(2)} min/sem</strong>, <strong>${ahorro2anios.toFixed(2)} min/2 años</strong></li>`;
-        resumenText += `${opt.parentElement.innerText.trim()}: ${ahorro.toFixed(2)} min/sem, ${ahorro2anios.toFixed(2)} min/2 años\n`;
-      });
+resultado.innerHTML = `
+       <strong>Ahorro estimado:</strong>
+       <ul>${resumen}</ul>
+       <p><strong>Total estimado en 2 años:</strong> ${ahorroTotal.toFixed(2)} minutos</p>
+     `;
 
-      resultado.innerHTML = `
-        <strong>Ahorro estimado:</strong>
-        <ul>${resumenHTML}</ul>
-        <p><strong>Total estimado en 2 años:</strong> ${ahorroTotal.toFixed(2)} minutos</p>
-      `;
+let desarrollo = {
+"Analítico": "Cursos en Power BI, Excel avanzado, automatización.",
+"Comunicador": "Storytelling, persuasión, liderazgo de equipos.",
+"Productivo": "Notion, metodologías ágiles, gestión personal.",
+"Investigador": "Lectura crítica, síntesis, herramientas de búsqueda."
+};
 
-      let desarrollo = {
-        "Analítico": "Cursos en Power BI, Excel avanzado, automatización.",
-        "Comunicador": "Storytelling, persuasión, liderazgo de equipos.",
-        "Productivo": "Notion, metodologías ágiles, gestión personal.",
-        "Investigador": "Lectura crítica, síntesis, herramientas de búsqueda."
-      };
+const perfilesUnicos = [...new Set(perfiles)];
+let sugerencias = perfilesUnicos.map(p => `<strong>${p}</strong>: ${desarrollo[p]}`).join("<br>");
 
-      const perfilesUnicos = [...new Set(perfiles)];
-      perfilText = perfilesUnicos.map(p => `${p}: ${desarrollo[p]}`).join("\n");
+perfil.innerHTML = `
+       <strong>Perfiles Detectados:</strong> ${perfilesUnicos.join(", ")}<br><br>
+       <strong>Sugerencias:</strong><br>${sugerencias}
+     `;
+}
 
-      perfil.innerHTML = `
-        <strong>Perfiles Detectados:</strong> ${perfilesUnicos.join(", ")}<br><br>
-        <strong>Sugerencias:</strong><br>${perfilText.replace(/\n/g, '<br>')}
-      `;
+async function exportarPDF() {
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
 
-      generarGrafico(tareas, ahorros);
-    }
+doc.setFontSize(16);
+doc.text("Resumen de Ahorro con IA", 20, 20);
+doc.setFontSize(12);
+doc.text(`Perfiles detectados: ${[...new Set(perfiles)].join(", ")}`, 20, 30);
+doc.text(`Ahorro estimado a 2 años: ${ahorroTotal.toFixed(2)} minutos`, 20, 40);
 
-    function generarGrafico(labels, data) {
-      document.getElementById('grafico').style.display = 'block';
-      const ctx = document.getElementById('grafico').getContext('2d');
-      if (chartInstance) chartInstance.destroy();
-      chartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Ahorro en 2 años (minutos)',
-            data,
-            backgroundColor: 'rgba(75, 192, 192, 0.7)'
-          }]
-        },
-        options: {
-          responsive: false,
-          scales: { y: { beginAtZero: true } }
-        }
-      });
-    }
-
-    async function exportarPDF() {
-      if (!chartInstance) {
-        alert("Por favor, primero calcula el ahorro para generar el gráfico.");
-        return;
-      }
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      const pageWidth = 210;
-      const margin = 15;
-      let y = margin;
-
-      // PORTADA
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(20);
-      doc.text("Calculadora de Ahorro con IA", pageWidth / 2, y + 20, { align: 'center' });
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(12);
-      doc.text("Informe personalizado de tiempo potencialmente ahorrado mediante herramientas de Inteligencia Artificial.", pageWidth / 2, y + 35, { align: 'center', maxWidth: pageWidth - 2 * margin });
-
-      const fecha = new Date().toLocaleDateString();
-      doc.setFontSize(10);
-      doc.text(`Fecha de generación: ${fecha}`, pageWidth / 2, y + 45, { align: 'center' });
-
-      doc.addPage();
-      y = margin;
-
-      // SECCIÓN: Ahorros
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(14);
-      doc.text("Resumen de Ahorros", margin, y);
-      y += 8;
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(11);
-      const resumenConPorcentajes = resumenText
-        .split("\n")
-        .map(line => {
-          const match = line.match(/(.+): ([\d.]+) min\/sem, ([\d.]+) min\/2 años/);
-          if (match) {
-            const [_, tarea, minSemana, min2Anios] = match;
-            const porcentaje = ((parseFloat(min2Anios) / ahorroTotal) * 100).toFixed(1);
-            return `${tarea}: ${minSemana} min/sem, ${min2Anios} min/2 años (${porcentaje}%)`;
-          }
-          return line;
-        })
-        .join("\n");
-
-      const resumenLines = doc.splitTextToSize(resumenConPorcentajes, pageWidth - 2 * margin);
-      resumenLines.forEach(line => {
-        doc.text(line, margin, y);
-        y += 6;
-      });
-
-      y += 4;
-      doc.setFont("helvetica", "bold");
-      doc.text(`Total estimado en 2 años: ${ahorroTotal.toFixed(2)} minutos`, margin, y);
-      y += 12;
-
-      // SECCIÓN: Perfiles
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(14);
-      doc.text("Perfiles Detectados y Recomendaciones", margin, y);
-      y += 8;
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(11);
-      const perfilLines = doc.splitTextToSize(perfilText, pageWidth - 2 * margin);
-      perfilLines.forEach(line => {
-        doc.text(line, margin, y);
-        y += 6;
-      });
-
-      y += 10;
-
-      // GRÁFICO
-      const canvas = document.getElementById('grafico');
-      const imageData = canvas.toDataURL('image/png');
-      const imgWidth = pageWidth - 2 * margin;
-      const imgHeight = imgWidth * 0.5;
-
-      if (y + imgHeight > 290) {
-        doc.addPage();
-        y = margin;
-      }
-
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(12);
-      doc.text("Gráfico de Ahorros por Tarea", margin, y);
-      y += 6;
-
-      doc.addImage(imageData, 'PNG', margin, y, imgWidth, imgHeight);
-      doc.save("ahorro_IA.pdf");
-    }
-  </script>
+doc.save("resumen_ahorro_IA.pdf");
+}
+</script>
 </body>
 </html>
