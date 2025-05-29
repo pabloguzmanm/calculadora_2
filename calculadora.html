@@ -5,7 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calculadora de Ahorro con IA</title>
   <style>
-    /* ... Tu CSS permanece igual ... */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .checkbox-label {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    button {
+      margin-top: 10px;
+      margin-right: 10px;
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
@@ -13,7 +53,10 @@
     <h1>Descubre Cuánto Tiempo Puedes Ahorrar con IA</h1>
     <label class="checkbox-label">Selecciona una o más tareas:</label>
     <div class="checkbox-group" id="tareas">
-      <!-- ... tus tareas ... -->
+      <label><input type="checkbox" value="60,30,Analítico"> Generar informes automáticamente</label>
+      <label><input type="checkbox" value="45,40,Productivo"> Organizar agenda con IA</label>
+      <label><input type="checkbox" value="30,50,Comunicador"> Redactar correos con IA</label>
+      <label><input type="checkbox" value="90,20,Investigador"> Buscar información en internet</label>
     </div>
 
     <div id="resultado"></div>
@@ -116,95 +159,99 @@
     }
 
     async function exportarPDF() {
-  if (!chartInstance) {
-    alert("Por favor, primero calcula el ahorro para generar el gráfico.");
-    return;
-  }
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-
-  const pageWidth = 210;
-  const margin = 15;
-  let y = margin;
-
-  // Título
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  doc.text("Resumen de Ahorro con IA", pageWidth / 2, y, { align: 'center' });
-
-  y += 10;
-
-  // Sección: Ahorros
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
-  doc.text("Ahorros estimados por tarea seleccionada:", margin, y);
-  y += 6;
-
-  const resumenLines = doc.splitTextToSize(resumenText, pageWidth - 2 * margin);
-  resumenLines.forEach(line => {
-    doc.text(line, margin, y);
-    y += 5;
-  });
-
-  y += 4;
-
-  doc.setFont("helvetica", "bold");
-  doc.text(`Total estimado en 2 años: ${ahorroTotal.toFixed(2)} minutos`, margin, y);
-  y += 10;
-
-  // Sección: Perfiles
-  doc.setFont("helvetica", "bold");
-  doc.text("Perfiles Detectados y Sugerencias:", margin, y);
-  y += 6;
-
-  doc.setFont("helvetica", "normal");
-  const perfilLines = doc.splitTextToSize(perfilText, pageWidth - 2 * margin);
-  perfilLines.forEach(line => {
-    doc.text(line, margin, y);
-    y += 5;
-  });
-
-  y += 6;
-
-  // Gráfico
-  const canvas = document.getElementById('grafico');
-  const imageData = canvas.toDataURL('image/png');
-
-  const imgWidth = pageWidth - 2 * margin;
-  const imgHeight = imgWidth * 0.5;
-
-  if (y + imgHeight > 290) {
-    doc.addPage();
-    y = margin;
-  }
-
-  doc.addImage(imageData, 'PNG', margin, y, imgWidth, imgHeight);
-
-  doc.save("ahorro_IA.pdf");
-}
-
-
-    function textJustify(doc, text, x, y, width, lineHeight) {
-      const lines = doc.splitTextToSize(text, width);
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        if (i === lines.length - 1 || line.indexOf(' ') === -1) {
-          doc.text(line, x, y);
-        } else {
-          const words = line.trim().split(/\s+/);
-          const gaps = words.length - 1;
-          const lineWidth = doc.getTextWidth(line);
-          const spaceWidth = (width - lineWidth) / gaps;
-          let cursor = x;
-          words.forEach((word, idx) => {
-            doc.text(word, cursor, y);
-            if (idx < gaps) cursor += doc.getTextWidth(word) + spaceWidth;
-          });
-        }
-        y += lineHeight;
+      if (!chartInstance) {
+        alert("Por favor, primero calcula el ahorro para generar el gráfico.");
+        return;
       }
-      return y;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pageWidth = 210;
+      const margin = 15;
+      let y = margin;
+
+      // PORTADA
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(20);
+      doc.text("Calculadora de Ahorro con IA", pageWidth / 2, y + 20, { align: 'center' });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
+      doc.text("Informe personalizado de tiempo potencialmente ahorrado mediante herramientas de Inteligencia Artificial.", pageWidth / 2, y + 35, { align: 'center', maxWidth: pageWidth - 2 * margin });
+
+      const fecha = new Date().toLocaleDateString();
+      doc.setFontSize(10);
+      doc.text(`Fecha de generación: ${fecha}`, pageWidth / 2, y + 45, { align: 'center' });
+
+      doc.addPage();
+      y = margin;
+
+      // SECCIÓN: Ahorros
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text("Resumen de Ahorros", margin, y);
+      y += 8;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      const resumenConPorcentajes = resumenText
+        .split("\n")
+        .map(line => {
+          const match = line.match(/(.+): ([\d.]+) min\/sem, ([\d.]+) min\/2 años/);
+          if (match) {
+            const [_, tarea, minSemana, min2Anios] = match;
+            const porcentaje = ((parseFloat(min2Anios) / ahorroTotal) * 100).toFixed(1);
+            return `${tarea}: ${minSemana} min/sem, ${min2Anios} min/2 años (${porcentaje}%)`;
+          }
+          return line;
+        })
+        .join("\n");
+
+      const resumenLines = doc.splitTextToSize(resumenConPorcentajes, pageWidth - 2 * margin);
+      resumenLines.forEach(line => {
+        doc.text(line, margin, y);
+        y += 6;
+      });
+
+      y += 4;
+      doc.setFont("helvetica", "bold");
+      doc.text(`Total estimado en 2 años: ${ahorroTotal.toFixed(2)} minutos`, margin, y);
+      y += 12;
+
+      // SECCIÓN: Perfiles
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text("Perfiles Detectados y Recomendaciones", margin, y);
+      y += 8;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      const perfilLines = doc.splitTextToSize(perfilText, pageWidth - 2 * margin);
+      perfilLines.forEach(line => {
+        doc.text(line, margin, y);
+        y += 6;
+      });
+
+      y += 10;
+
+      // GRÁFICO
+      const canvas = document.getElementById('grafico');
+      const imageData = canvas.toDataURL('image/png');
+      const imgWidth = pageWidth - 2 * margin;
+      const imgHeight = imgWidth * 0.5;
+
+      if (y + imgHeight > 290) {
+        doc.addPage();
+        y = margin;
+      }
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.text("Gráfico de Ahorros por Tarea", margin, y);
+      y += 6;
+
+      doc.addImage(imageData, 'PNG', margin, y, imgWidth, imgHeight);
+      doc.save("ahorro_IA.pdf");
     }
   </script>
 </body>
